@@ -86,6 +86,9 @@ files:
   - name: test/gitone/objects/61/8383db6d7ee3bd2e97b871205f113b6a3ba854
     visible: false
     learner_created: false
-feedback_link: https://hyperskill.org/projects/110/stages/595/implement#comment
-status: Unchecked
+feedback_link: https://hyperskill.org/learn/step/9837#comment
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Thu, 16 Nov 2023 22:18:40 UTC"
 record: -1
