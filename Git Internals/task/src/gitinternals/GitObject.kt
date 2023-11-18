@@ -6,59 +6,64 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.zip.InflaterInputStream
 
-private val Int.b get() = this.toByte()
-private val BYTE_CHANGE = mapOf(0x0.b to 0xA.b)  // NULL to \n
+private const val byteNull: Byte = 0
+private const val byteSpace = ' '.code.toByte()
+private val BYTE_CHANGE = mapOf(byteNull to '\n'.code.toByte())
 private val DT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss xxx")
 
-abstract class GitObject(val text: List<String>) {
+abstract class GitObject(val bytes: ByteArray) {
     abstract val type: String
     abstract val body: String
 
-    companion object {
-        fun factory(path: String): GitObject? =
-            readFile(path).let { list ->
-                when (list[0].takeWhile { it != ' ' }) {
-                    "blob" -> Blob(list)
-                    "commit" -> Commit(list)
-                    else -> null
-                }
-            }
-
-        private fun readFile(path: String): List<String> =
-            InflaterInputStream(FileInputStream(path)).use { iis ->
-                iis.readAllBytes()
-                    .map { b -> BYTE_CHANGE.getOrDefault(b, b) }
-                    .toByteArray()
-                    .let { bAr -> String(bAr).split("\n") }
-            }
-    }
-
     override fun toString() = "*$type*\n$body"
 
-    class Blob(list: List<String>) : GitObject(list) {
-        override val type = "BLOB"
-        override val body = this.text.drop(1).joinToString("\n")
+    companion object {
+        fun factory(path: String): GitObject? {
+            val bytes = readFile(path)
+            val type = String(bytes.takeWhile { it != byteSpace }.toByteArray())
+            return when (type) {
+                "blob" -> Blob(bytes)
+                "commit" -> Commit(bytes)
+                "tree" -> Tree(bytes)
+                else -> null
+            }
+        }
+
+        private fun readFile(path: String): ByteArray =
+            InflaterInputStream(FileInputStream(path))
+                .use { iis -> iis.readAllBytes()!! }
+
+        private fun byteArrayToLines(bytes: ByteArray): List<String> =
+            bytes.map { b -> BYTE_CHANGE.getOrDefault(b, b) }
+                .toByteArray()
+                .let { bAr -> String(bAr).split("\n") }
+
+        private fun bytesToStr(bytes: List<Byte>): String =
+            bytes.map { Char(it.toUShort()) }.joinToString("")
     }
 
-    class Commit(list: List<String>) : GitObject(list) {
+    class Blob(bytes: ByteArray) : GitObject(bytes) {
+        override val type = "BLOB"
+        override val body = byteArrayToLines(bytes).drop(1).joinToString("\n")
+    }
+
+    class Commit(bytes: ByteArray) : GitObject(bytes) {
         override val type = "COMMIT"
         private var tree: String = ""
         private var parents = mutableListOf<String>()
         private var authors = mutableListOf<Author>()
         private var commitMsg = ""
-        override val body: String
-            get() = buildString {
-                append(tree)
-                if (parents.isNotEmpty())
-                    append("\nparents: ").append(parents.joinToString(" | "))
-                append('\n').append(authors[0])
-                append('\n').append(authors[1])
-                append("\ncommit message:\n")
-                append(commitMsg)
-            }
+        override val body get() = buildString {
+            append(tree)
+            if (parents.isNotEmpty())
+                append("\nparents: ").append(parents.joinToString(" | "))
+            authors.forEach { append('\n').append(it) }
+            append("\ncommit message:\n")
+            append(commitMsg)
+        }
 
         init {
-            with(text.drop(1).toMutableList()) {
+            with(byteArrayToLines(bytes).drop(1).toMutableList()) {
                 // Parse commit message:
                 val emptyIndex = indexOf("")
                 if (emptyIndex > -1) {
@@ -96,5 +101,29 @@ abstract class GitObject(val text: List<String>) {
             override fun toString(): String =
                 "$role: $name $email $type timestamp: $dateTime"
         }
+    }
+
+    class Tree(bytes: ByteArray) : GitObject(bytes) {
+        override val type = "TREE"
+        override val body get() = bytes.indexOf(byteNull)
+            .let { nullIndex ->  // get rid of the header
+                var treeBytes = bytes.drop(nullIndex + 1)
+                val lines = mutableListOf<String>()
+                while (treeBytes.isNotEmpty()) {
+                    var i = treeBytes.indexOf(byteSpace)
+                    val permissions = bytesToStr(treeBytes.take(i))
+                    treeBytes = treeBytes.drop(i + 1)
+
+                    i = treeBytes.indexOf(byteNull)
+                    val name = bytesToStr(treeBytes.take(i))
+                    treeBytes = treeBytes.drop(i + 1)
+
+                    val hash = treeBytes.take(20).joinToString("") { "%02x".format(it) }
+                    treeBytes = treeBytes.drop(20)
+
+                    lines.add("$permissions $hash $name")
+                }
+                lines.joinToString("\n")
+            }
     }
 }
