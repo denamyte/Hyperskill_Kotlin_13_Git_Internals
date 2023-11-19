@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":Topics-Recursion-Programming_a_recursive_function__calculating_the_sum_of_numbers_from_1_to_n" external.linked.project.path="$MODULE_DIR$/../../../../../Topics/Recursion/Programming a recursive function  calculating the sum of numbers from 1 to n" external.root.project.path="$MODULE_DIR$/../../../../.." external.system.id="GRADLE" external.system.module.group="13_Git_Internals" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../../../Topics/Recursion/Programming a recursive function  calculating the sum of numbers from 1 to n">
+      <excludeFolder url="file://$MODULE_DIR$/../../../../../Topics/Recursion/Programming a recursive function  calculating the sum of numbers from 1 to n/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../../Topics/Recursion/Programming a recursive function  calculating the sum of numbers from 1 to n/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../../Topics/Recursion/Programming a recursive function  calculating the sum of numbers from 1 to n/out" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

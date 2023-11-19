@@ -1,0 +1,33 @@
+<h2>Is this actually recursion?</h2>
+<div class="step-text">
+<p></p>
+<p>Which of these functions utilize recursion?</p>
+<ol>
+<li>
+<pre><code class="language-kotlin">fun f1(a : Int, b : Int) : Int = a + b</code></pre>
+</li>
+<li>
+<pre><code class="language-kotlin">fun f2(n: Int): Int {
+   if (n == 0 || n == 1) return 1
+   return n * f2(n - 1)
+}</code></pre>
+</li>
+<li>
+<pre><code class="language-kotlin">fun f3(n: Int): Int {
+   var f = 1
+   for (i in 1..n)
+       f *= i
+   return f
+}
+</code></pre>
+</li>
+<li>
+<pre><code class="language-kotlin">fun f4(n : Int) {
+   if(n &lt; 1) return
+   print(n)
+   f4(n-1)
+}</code></pre>
+<p> </p>
+</li>
+</ol>
+</div>

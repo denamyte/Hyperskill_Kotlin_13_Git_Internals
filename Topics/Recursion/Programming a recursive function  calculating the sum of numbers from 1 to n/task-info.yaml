@@ -1,0 +1,24 @@
+type: code
+custom_name: "Programming a recursive function: calculating the sum of numbers from\
+  \ 1 to n."
+files:
+  - name: src/Main.kt
+    visible: true
+    text: |-
+      fun sumRecursive(n: Int): Int {
+          // base case / terminal condition here
+          // recursive call here
+      }
+      
+      fun main() {
+          val n = readLine()!!.toInt()
+          print(sumRecursive(n))
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/13609#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Sun, 19 Nov 2023 22:03:58 UTC"
+record: -1
+submission_language: kotlin
