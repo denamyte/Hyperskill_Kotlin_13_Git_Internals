@@ -1,0 +1,17 @@
+type: code
+files:
+  - name: src/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: |-
+      fun <T> countElementsOfType(list: List<Any>, clazz: Class<T>): Int {
+          // make your code here
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/26462#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Mon, 20 Nov 2023 19:29:58 UTC"
+record: -1
+submission_language: kotlin

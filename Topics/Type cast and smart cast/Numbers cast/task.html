@@ -1,0 +1,15 @@
+<h2>Numbers cast</h2>
+<div class="step-text">
+<p>What will be the output of this program?</p><pre><code class="language-kotlin">fun myFun(myList: MutableList&lt;Any&gt;): Int {
+    var result = 0
+    for (item in myList) {
+        result += item as? Int ?: 0
+    }
+    return result
+}
+
+fun main() {
+    val myList = mutableListOf&lt;Any&gt;("hello", 3, "world", 3, 1, 7.0, 20L, 3)
+    println(myFun(myList))
+}</code></pre>
+</div>

@@ -1,0 +1,14 @@
+<h2>Safe cast type to String</h2>
+<div class="step-text">
+<p></p><p>Look at the code below:</p><pre><code class="language-kotlin">fun convertToStringList(objects: List&lt;Any&gt;): List&lt;String&gt; {
+    val stringList = mutableListOf&lt;String&gt;()
+    for (obj in objects) {
+        val str = obj /*?*/ String
+        if (str != null) {
+            stringList.add(str)
+        }
+    }
+    return stringList
+}
+</code></pre><p>Choose the correct type-checking operator to replace the comment on line 4.</p>
+</div>
