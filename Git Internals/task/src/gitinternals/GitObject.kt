@@ -11,23 +11,27 @@ private const val byteSpace = ' '.code.toByte()
 private val BYTE_CHANGE = mapOf(byteNull to '\n'.code.toByte())
 private val DT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss xxx")
 
-abstract class GitObject(val bytes: ByteArray) {
+abstract class GitObject(val bytes: ByteArray, val hash: String) {
     abstract val type: String
     abstract val body: String
 
     override fun toString() = "*$type*\n$body"
 
     companion object {
-        fun factory(path: String): GitObject? {
+        fun factory(root: String, hash: String): GitObject? {
+            val path = makeHashPath(root, hash)
             val bytes = readFile(path)
             val type = String(bytes.takeWhile { it != byteSpace }.toByteArray())
             return when (type) {
-                "blob" -> Blob(bytes)
-                "commit" -> Commit(bytes)
-                "tree" -> Tree(bytes)
+                "blob" -> Blob(bytes, hash)
+                "commit" -> Commit(bytes, hash)
+                "tree" -> Tree(bytes, hash)
                 else -> null
             }
         }
+
+        private fun makeHashPath(root: String, hash: String) =
+            with(hash) { "$root/objects/${take(2)}/${drop(2)}" }
 
         private fun readFile(path: String): ByteArray =
             InflaterInputStream(FileInputStream(path))
@@ -40,24 +44,33 @@ abstract class GitObject(val bytes: ByteArray) {
 
         private fun bytesToStr(bytes: List<Byte>): String =
             bytes.map { Char(it.toUShort()) }.joinToString("")
+
+        fun getCommit(root: String, hash: String): Commit =
+            factory(root, hash).run {
+                this as? Commit
+                    ?: throw IllegalArgumentException("A commit file required!")
+            }
     }
 
-    class Blob(bytes: ByteArray) : GitObject(bytes) {
+    class Blob(bytes: ByteArray, hash: String) : GitObject(bytes, hash) {
         override val type = "BLOB"
         override val body = byteArrayToLines(bytes).drop(1).joinToString("\n")
     }
 
-    class Commit(bytes: ByteArray) : GitObject(bytes) {
+    class Commit(bytes: ByteArray, hash: String) : GitObject(bytes, hash) {
         override val type = "COMMIT"
         private var tree: String = ""
-        private var parents = mutableListOf<String>()
-        private var authors = mutableListOf<Author>()
-        private var commitMsg = ""
+        var parents = mutableListOf<String>()
+            private set
+        var authors = mutableListOf<Author>()
+            private set
+        var commitMsg: String? = null
+            private set
         override val body get() = buildString {
             append(tree)
             if (parents.isNotEmpty())
                 append("\nparents: ").append(parents.joinToString(" | "))
-            authors.forEach { append('\n').append(it) }
+            authors.forEach { append('\n').append("${it.role}: $it") }
             append("\ncommit message:\n")
             append(commitMsg)
         }
@@ -82,7 +95,7 @@ abstract class GitObject(val bytes: ByteArray) {
         }
 
         class Author(text: String) {
-            private val role: String
+            val role: String
             private val name: String
             private val email: String
             private val type: String get() = if (role == "author") "original" else "commit"
@@ -99,11 +112,11 @@ abstract class GitObject(val bytes: ByteArray) {
             }
 
             override fun toString(): String =
-                "$role: $name $email $type timestamp: $dateTime"
+                "$name $email $type timestamp: $dateTime"
         }
     }
 
-    class Tree(bytes: ByteArray) : GitObject(bytes) {
+    class Tree(bytes: ByteArray, hash: String) : GitObject(bytes, hash) {
         override val type = "TREE"
         override val body get() = bytes.indexOf(byteNull)
             .let { nullIndex ->  // get rid of the header
