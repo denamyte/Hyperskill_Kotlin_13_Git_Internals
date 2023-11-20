@@ -59,7 +59,8 @@ abstract class GitObject(val bytes: ByteArray, val hash: String) {
 
     class Commit(bytes: ByteArray, hash: String) : GitObject(bytes, hash) {
         override val type = "COMMIT"
-        private var tree: String = ""
+        var treeHash: String = ""
+            private set
         var parents = mutableListOf<String>()
             private set
         var authors = mutableListOf<Author>()
@@ -67,7 +68,7 @@ abstract class GitObject(val bytes: ByteArray, val hash: String) {
         var commitMsg: String? = null
             private set
         override val body get() = buildString {
-            append(tree)
+            append("tree: ").append(treeHash)
             if (parents.isNotEmpty())
                 append("\nparents: ").append(parents.joinToString(" | "))
             authors.forEach { append('\n').append("${it.role}: $it") }
@@ -86,7 +87,7 @@ abstract class GitObject(val bytes: ByteArray, val hash: String) {
                 // Parse the rest:
                 forEach { line ->
                     when {
-                        line.startsWith("tree") -> tree = line.replaceBefore(" ", "tree:")
+                        line.startsWith("tree") -> treeHash = line.replace("tree ", "")
                         line.startsWith("parent") -> parents.add(line.replace("parent ", ""))
                         line.startsWith("author") || line.startsWith("committer") -> authors.add(Author(line))
                     }
@@ -118,25 +119,34 @@ abstract class GitObject(val bytes: ByteArray, val hash: String) {
 
     class Tree(bytes: ByteArray, hash: String) : GitObject(bytes, hash) {
         override val type = "TREE"
-        override val body get() = bytes.indexOf(byteNull)
-            .let { nullIndex ->  // get rid of the header
-                var treeBytes = bytes.drop(nullIndex + 1)
-                val lines = mutableListOf<String>()
-                while (treeBytes.isNotEmpty()) {
-                    var i = treeBytes.indexOf(byteSpace)
-                    val permissions = bytesToStr(treeBytes.take(i))
-                    treeBytes = treeBytes.drop(i + 1)
+        var items = listOf<Item>()
+            private set
+        override val body: String
 
-                    i = treeBytes.indexOf(byteNull)
-                    val name = bytesToStr(treeBytes.take(i))
-                    treeBytes = treeBytes.drop(i + 1)
+        init {
+            bytes.indexOf(byteNull)
+                .let { nullIndex ->  // get rid of the header
+                    var treeBytes = bytes.drop(nullIndex + 1)
+                    while (treeBytes.isNotEmpty()) {
+                        var i = treeBytes.indexOf(byteSpace)
+                        val permissions = bytesToStr(treeBytes.take(i))
+                        treeBytes = treeBytes.drop(i + 1)
 
-                    val hash = treeBytes.take(20).joinToString("") { "%02x".format(it) }
-                    treeBytes = treeBytes.drop(20)
+                        i = treeBytes.indexOf(byteNull)
+                        val name = bytesToStr(treeBytes.take(i))
+                        treeBytes = treeBytes.drop(i + 1)
 
-                    lines.add("$permissions $hash $name")
+                        val itemHash = treeBytes.take(20).joinToString("") { "%02x".format(it) }
+                        treeBytes = treeBytes.drop(20)
+
+                        items += Item(permissions, name, itemHash)
+                    }
+                    body = items.joinToString("\n")
                 }
-                lines.joinToString("\n")
-            }
+        }
+
+        class Item(val permissions: String, val name: String, val hash: String) {
+            override fun toString() = "$permissions $hash $name"
+        }
     }
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":Topics-Type_cast_and_smart_cast-Defining_a_variable_type" external.linked.project.path="$MODULE_DIR$/../../../../../Topics/Type cast and smart cast/Defining a variable type" external.root.project.path="$MODULE_DIR$/../../../../.." external.system.id="GRADLE" external.system.module.group="13_Git_Internals" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../../../Topics/Type cast and smart cast/Defining a variable type">
+      <excludeFolder url="file://$MODULE_DIR$/../../../../../Topics/Type cast and smart cast/Defining a variable type/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../../Topics/Type cast and smart cast/Defining a variable type/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../../Topics/Type cast and smart cast/Defining a variable type/out" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

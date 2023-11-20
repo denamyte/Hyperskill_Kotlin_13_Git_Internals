@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":Topics-Type_cast_and_smart_cast-Safe_cast_type_to_String" external.linked.project.path="$MODULE_DIR$/../../../../../Topics/Type cast and smart cast/Safe cast type to String" external.root.project.path="$MODULE_DIR$/../../../../.." external.system.id="GRADLE" external.system.module.group="13_Git_Internals" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../../../Topics/Type cast and smart cast/Safe cast type to String">
+      <excludeFolder url="file://$MODULE_DIR$/../../../../../Topics/Type cast and smart cast/Safe cast type to String/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../../Topics/Type cast and smart cast/Safe cast type to String/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../../Topics/Type cast and smart cast/Safe cast type to String/out" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
